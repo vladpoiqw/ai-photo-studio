@@ -3,6 +3,8 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
+const API_URL = "https://api-photo-studio-ai.onrender.com";
+
 const fileInput = document.getElementById("fileInput");
 const uploadButton = document.getElementById("uploadButton");
 const preview = document.getElementById("preview");
@@ -12,11 +14,13 @@ let selectedFile = null;
 let selectedStyle = "studio";
 
 
+// Загрузка фотографии
 uploadButton.addEventListener("click", () => {
     fileInput.click();
 });
 
 
+// Выбрали фотографию
 fileInput.addEventListener("change", () => {
 
     const file = fileInput.files[0];
@@ -37,12 +41,15 @@ fileInput.addEventListener("change", () => {
 });
 
 
+// Выбор стиля
 document.querySelectorAll(".style").forEach(button => {
 
     button.addEventListener("click", () => {
 
         document.querySelectorAll(".style")
-            .forEach(item => item.classList.remove("active"));
+            .forEach(item => {
+                item.classList.remove("active");
+            });
 
         button.classList.add("active");
 
@@ -52,17 +59,91 @@ document.querySelectorAll(".style").forEach(button => {
 });
 
 
-generateButton.addEventListener("click", () => {
+// Генерация
+generateButton.addEventListener("click", async () => {
 
     if (!selectedFile) {
 
-        tg.showAlert("Сначала загрузи фотографию товара.");
+        tg.showAlert(
+            "Сначала загрузи фотографию товара."
+        );
 
         return;
     }
 
-    tg.showAlert(
-        `Фото загружено!\nСтиль: ${selectedStyle}\n\nAI-генерацию подключим следующим этапом.`
-    );
+    generateButton.disabled = true;
+    generateButton.innerText = "✨ Создаём фото...";
+
+    try {
+
+        const formData = new FormData();
+
+        formData.append(
+            "image",
+            selectedFile
+        );
+
+        formData.append(
+            "style",
+            selectedStyle
+        );
+
+        const response = await fetch(
+            `${API_URL}/generate`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.detail || "Ошибка генерации"
+            );
+        }
+
+        if (!data.image_base64) {
+
+            throw new Error(
+                "AI не вернул изображение"
+            );
+        }
+
+        // Показываем результат
+        preview.innerHTML = `
+            <img
+                src="data:image/png;base64,${data.image_base64}"
+                alt="Готовое фото"
+            >
+        `;
+
+        preview.style.display = "block";
+
+        generateButton.innerText = "✨ Создать ещё";
+
+        tg.HapticFeedback.notificationOccurred(
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        tg.showAlert(
+            "Не удалось создать фото:\n" +
+            error.message
+        );
+
+        generateButton.innerText =
+            "✨ Создать фото";
+
+    } finally {
+
+        generateButton.disabled = false;
+
+    }
 
 });
