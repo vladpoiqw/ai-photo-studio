@@ -18,6 +18,7 @@ uploadButton.addEventListener("click", () => {
 });
 
 fileInput.addEventListener("change", () => {
+
     const file = fileInput.files[0];
 
     if (!file) return;
@@ -34,6 +35,7 @@ fileInput.addEventListener("change", () => {
 });
 
 document.querySelectorAll(".style").forEach(button => {
+
     button.addEventListener("click", () => {
 
         document.querySelectorAll(".style")
@@ -43,49 +45,74 @@ document.querySelectorAll(".style").forEach(button => {
 
         selectedStyle = button.dataset.style;
     });
+
 });
 
 generateButton.addEventListener("click", async () => {
 
     if (!selectedFile) {
-        tg.showAlert("Сначала загрузи фотографию.");
+        tg.showAlert("Сначала загрузи фотографию товара.");
         return;
     }
 
     generateButton.disabled = true;
-    generateButton.innerText = "Проверяем соединение...";
+    generateButton.innerText = "✨ Создаём фото...";
 
     try {
 
-        const response = await fetch(`${API_URL}/health`, {
-            method: "GET"
-        });
+        const formData = new FormData();
 
-        if (!response.ok) {
-            throw new Error(
-                `Сервер ответил: ${response.status}`
-            );
-        }
+        formData.append("image", selectedFile);
+        formData.append("style", selectedStyle);
+
+        const response = await fetch(
+            `${API_URL}/generate`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
 
         const data = await response.json();
 
-        tg.showAlert(
-            "Связь с сервером работает!\n\n" +
-            JSON.stringify(data)
-        );
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Ошибка генерации"
+            );
+        }
 
-        generateButton.innerText = "Связь работает";
+        if (!data.image_base64) {
+            throw new Error(
+                "AI не вернул изображение"
+            );
+        }
+
+        preview.innerHTML = `
+            <img
+                src="data:image/png;base64,${data.image_base64}"
+                alt="Готовое фото"
+            >
+        `;
+
+        preview.style.display = "block";
+
+        generateButton.innerText = "✨ Создать ещё";
+
+        if (tg.HapticFeedback) {
+            tg.HapticFeedback.notificationOccurred("success");
+        }
 
     } catch (error) {
 
         console.error(error);
 
         tg.showAlert(
-            "Не удалось подключиться к серверу.\n\n" +
+            "Не удалось создать фото:\n\n" +
             error.message
         );
 
-        generateButton.innerText = "Ошибка соединения";
+        generateButton.innerText =
+            "✨ Создать фото";
 
     } finally {
 
