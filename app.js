@@ -76,59 +76,67 @@ generateButton.addEventListener("click", async () => {
 
     try {
 
-        const formData = new FormData();
+    console.log("Отправляем запрос на:", `${API_URL}/generate`);
 
-        formData.append(
-            "image",
-            selectedFile
-        );
+    const formData = new FormData();
 
-        formData.append(
-            "style",
-            selectedStyle
-        );
+    formData.append("image", selectedFile);
+    formData.append("style", selectedStyle);
 
-        const response = await fetch(
-            `${API_URL}/generate`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+    console.log("Файл:", selectedFile.name);
+    console.log("Тип:", selectedFile.type);
+    console.log("Размер:", selectedFile.size);
 
-        const data = await response.json();
-
-        if (!response.ok) {
-
-            throw new Error(
-                data.detail || "Ошибка генерации"
-            );
+    const response = await fetch(
+        `${API_URL}/generate`,
+        {
+            method: "POST",
+            body: formData
         }
+    );
 
-        if (!data.image_base64) {
+    console.log("Ответ сервера:", response.status);
 
-            throw new Error(
-                "AI не вернул изображение"
-            );
-        }
+    const data = await response.json();
 
-        // Показываем результат
-        preview.innerHTML = `
-            <img
-                src="data:image/png;base64,${data.image_base64}"
-                alt="Готовое фото"
-            >
-        `;
+    console.log("Данные:", data);
 
-        preview.style.display = "block";
-
-        generateButton.innerText = "✨ Создать ещё";
-
-        tg.HapticFeedback.notificationOccurred(
-            "success"
+    if (!response.ok) {
+        throw new Error(
+            data.detail || "Ошибка генерации"
         );
+    }
 
-    } catch (error) {
+    if (!data.image_base64) {
+        throw new Error(
+            "AI не вернул изображение"
+        );
+    }
+
+    preview.innerHTML = `
+        <img
+            src="data:image/png;base64,${data.image_base64}"
+            alt="Готовое фото"
+        >
+    `;
+
+    preview.style.display = "block";
+
+    generateButton.innerText = "✨ Создать ещё";
+
+    tg.HapticFeedback.notificationOccurred("success");
+
+} catch (error) {
+
+    console.error("ОШИБКА:", error);
+
+    tg.showAlert(
+        "Ошибка:\n" + error.message
+    );
+
+    generateButton.innerText = "✨ Создать фото";
+
+}
 
         console.error(error);
 
