@@ -1,1 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>AI Фотостудия</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <div class="header">
+            <div class="logo">AI</div>
+
+            <div>
+                <h1>Фотостудия</h1>
+                <p>Создай продающее фото товара</p>
+            </div>
+        </div>
+
+        <div class="upload-box" id="uploadBox">
+
+            <div class="upload-icon">＋</div>
+
+            <h2>Загрузить товар</h2>
+
+            <p>
+                Добавь фотографию товара,
+                а мы превратим её в профессиональное фото
+            </p>
+
+            <button id="uploadButton">
+                Выбрать фото
+            </button>
+
+            <input
+                type="file"
+                id="fileInput"
+                accept="image/*"
+                hidden
+            >
+
+        </div>
+
+        <div class="preview" id="preview"></div>
+
+        <div class="styles">
+
+            <h2>Выбери стиль</h2>
+
+            <div class="style-list">
+
+                <button class="style active" data-style="studio">
+                    <span>🏢</span>
+                    <b>Студия</b>
+                    <small>Чистый фон</small>
+                </button>
+
+                <button class="style" data-style="premium">
+                    <span>🖤</span>
+                    <b>Premium</b>
+                    <small>Дорогой стиль</small>
+                </button>
+
+                <button class="style" data-style="interior">
+                    <span>🏠</span>
+                    <b>Интерьер</b>
+                    <small>Товар в помещении</small>
+                </button>
+
+                <button class="style" data-style="lifestyle">
+                    <span>✨</span>
+                    <b>Lifestyle</b>
+                    <small>Рекламная сцена</small>
+                </button>
+
+            </div>
+
+        </div>
+
+        <button class="generate" id="generateButton">
+            ✨ Создать фото
+        </button>
+
+    </div>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
 
