@@ -98,10 +98,6 @@ generateButton.addEventListener("click", async () => {
 
         generateButton.innerText = "✨ Создать ещё";
 
-        if (tg.HapticFeedback) {
-            tg.HapticFeedback.notificationOccurred("success");
-        }
-
     } catch (error) {
 
         console.error(error);
@@ -111,12 +107,12 @@ generateButton.addEventListener("click", async () => {
             error.message
         );
 
-        generateButton.innerText =
-            "✨ Создать фото";
+        generateButton.innerText = "✨ Создать фото";
 
     } finally {
 
         generateButton.disabled = false;
 
     }
+
 });
